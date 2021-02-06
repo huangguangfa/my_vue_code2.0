@@ -1,4 +1,4 @@
-import observe from './observe'
+import observe from '.'
 function observeArr( arr ){
     for(let i = 0; i<arr.length; i++){
         observe(arr[i])

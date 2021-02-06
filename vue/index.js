@@ -1,14 +1,10 @@
-import { initState } from './init'
+import { initMixin } from './init'
 
-function Vue(option){
-    this._init(option)
+function Vue(options){
+    this._init(options)
 }
 
-Vue.prototype._init = function(option){
-    let vm = this;
-    vm.$options = option;
+initMixin(Vue);
 
-    initState(vm)
-}
 
 export default Vue;

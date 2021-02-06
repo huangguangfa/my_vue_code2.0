@@ -1,5 +1,5 @@
 import observeArr from './observeArr';
-import { ARR_METHODS } from './config';
+import { ARR_METHODS } from '../config';
 
 let originArrMethods = Array.prototype,
     arrMethods = Object.create(originArrMethods);

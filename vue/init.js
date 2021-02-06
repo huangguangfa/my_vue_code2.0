@@ -1,24 +1,35 @@
-import proxyData from './proxy';
-import observe from './observe'
-function initState(vm){
-    let options = vm.$options;
-    if(options.data){
-        initData(vm)
-    }
-}
+import { initState } from './state';
+import { compileToRenderFunction } from './compiler';
+function initMixin(Vue){
+    Vue.prototype._init = function(options){
+        let vm = this;
+        vm.$options = options;
+        initState(vm)
 
-
-function initData(vm){
-    let data = vm.$options.data;
-    data = vm._data = typeof data === 'function' ? data.call(vm): data || {};
-    
-    for( let key in data ){
-        proxyData(vm,'_data',key);
+        if(vm.$options.el){
+            //挂载函数
+            vm.$mount(vm.$options.el)
+        }
     }
 
-    observe(vm._data)
+    Vue.prototype.$mount = function(el){
+        const vm = this,
+              options = vm.$options;
+        el = document.querySelector(el);
+        vm.$el = el;
+
+        if(!options.render){
+            let template = options.template;
+            if(!template && el){
+                template = el.outerHTML;
+            }
+
+            const render = compileToRenderFunction(template);
+            options.render = render;
+        }
+    }
 }
 
 export {
-    initState
+    initMixin
 }

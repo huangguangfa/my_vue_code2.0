@@ -3,16 +3,18 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "rollup -c -w",
     "build": "webpack"
   },
   "license": "MIT",
   "dependencies": {
-    "html-webpack-plugin": "^4.5.1",
-    "webpack": "^5.20.0",
-    "webpack-dev-server": "^3.11.2"
+    "@babel/core": "^7.12.13",
+    "@babel/preset-env": "^7.12.13",
+    "rollup": "^2.38.4",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-serve": "^1.1.0"
   },
-  "devDependencies": {
-    "webpack-cli": "^3.3.10"
-  }
+  "devDependencies": {}
 }

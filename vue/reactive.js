@@ -1,4 +1,4 @@
-import observe from './observe'
+import observe from './observer'
 function defineReactiveData(data,key,value){
     observe(value);
     Object.defineProperty(data,key,{
