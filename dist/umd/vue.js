@@ -310,16 +310,15 @@
       const children = el.children;
 
       if (children) {
-        return children.map(c => generateChildren(c)).join(',');
+        return children.map(node => generateChildren(node)).join(',');
       }
     }
 
     function generate(el) {
       let children = getChildren(el);
-      let code = `
-        _c('${el.tag}', ${el.attrs.length > 0 ? formatProps(el.attrs) : 'undefind'}
-        ,${children})
-    `;
+      let code = `_c('${el.tag}',  
+    ${el.attrs.length > 0 ? `${formatProps(el.attrs)}` : 'undefined'}
+    ${children ? `,${children}` : ''})`;
       return code;
     }
 
@@ -329,7 +328,65 @@
             render = new Function(`
             with(this) { return ${code} }
           `);
-      console.log(render);
+      return render;
+    }
+
+    function patch(oldNode, vNode) {
+      let el = createElement(vNode),
+          parentElement = oldNode.parentNode; //把el插入到oldNode后面然后把前面的旧节点进行删除、这样做的目地是怕后面有script标签啥的
+
+      parentElement.insertBefore(el, oldNode.nextSibling);
+      parentElement.removeChild(oldNode);
+    }
+
+    function createElement(vnode) {
+      const {
+        tag,
+        props,
+        children,
+        text
+      } = vnode;
+
+      if (typeof tag === 'string') {
+        vnode.el = document.createElement(tag);
+        updateProps(vnode);
+        children.map(child => {
+          //递归
+          vnode.el.appendChild(createElement(child));
+        });
+      } else {
+        vnode.el = document.createTextNode(text);
+      }
+
+      return vnode.el;
+    }
+
+    function updateProps(vnode) {
+      const el = vnode.el,
+            newProps = vnode.props || {};
+
+      for (let key in newProps) {
+        if (key === 'style') {
+          for (let sKey in newProps.style) {
+            el.style[sKey] = newProps.style[sKey];
+          }
+        } else if (key === 'class') {
+          el.className = el.class;
+        } else {
+          el.setAttribute(key, newProps[key]);
+        }
+      }
+    }
+
+    function mountComponent(vm) {
+      vm._updata(vm._render());
+    }
+
+    function lifecycleMixin(Vue) {
+      Vue.prototype._updata = function (vnode) {
+        const vm = this;
+        patch(vm.$el, vnode);
+      };
     }
 
     function initMixin(Vue) {
@@ -360,6 +417,48 @@
           const render = compileToRenderFunction(template);
           options.render = render;
         }
+
+        mountComponent(vm);
+      };
+    }
+
+    function createElement$1(tag, attrs = {}, ...children) {
+      return vnode(tag, attrs, children);
+    }
+
+    function createTextVnode(text) {
+      return vnode(undefined, undefined, undefined, text);
+    }
+
+    function vnode(tag, props, children, text) {
+      return {
+        tag,
+        props,
+        children,
+        text
+      };
+    }
+
+    function renderMixin(Vue) {
+      Vue.prototype._c = function () {
+        return createElement$1(...arguments);
+      };
+
+      Vue.prototype._s = function (value) {
+        if (value === null) return;
+        return typeof value === 'object' ? JSON.stringify(value) : value;
+      };
+
+      Vue.prototype._v = function (text) {
+        return createTextVnode(text);
+      };
+
+      Vue.prototype._render = function () {
+        const vm = this,
+              render = vm.$options.render,
+              //虚拟节点
+        vnode = render.call(this);
+        return vnode;
       };
     }
 
@@ -368,6 +467,8 @@
     }
 
     initMixin(Vue);
+    lifecycleMixin(Vue);
+    renderMixin(Vue);
 
     return Vue;
 

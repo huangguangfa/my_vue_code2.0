@@ -49,20 +49,15 @@ function generateChildren(node){
 function getChildren(el){
     const children = el.children;
     if(children){
-        return children.map( c => generateChildren(c)).join(',');
+        return children.map( node => generateChildren(node)).join(',');
     }
 }
 
 function generate(el){
     let children = getChildren(el);
-    let code = `
-        _c('${el.tag}', ${
-            el.attrs.length > 0 ?  formatProps(el.attrs) : 'undefind'
-        }
-        ,${
-            children
-        })
-    `  
+    let code = `_c('${ el.tag }',  
+    ${ el.attrs.length > 0  ?  `${ formatProps(el.attrs) }` : 'undefined' }
+    ${ children ? `,${children}` : '' })`;
     return code;
 }
 
