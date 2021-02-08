@@ -1,5 +1,6 @@
 import observe from './observer'
 function defineReactiveData(data,key,value){
+    //递归做拦截
     observe(value);
     Object.defineProperty(data,key,{
         get(){

@@ -20,6 +20,7 @@
     }
 
     function defineReactiveData(data, key, value) {
+      //递归做拦截
       observe(value);
       Object.defineProperty(data, key, {
         get() {
@@ -47,8 +48,10 @@
     const ARR_METHODS = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse'];
 
     let originArrMethods = Array.prototype,
-        arrMethods = Object.create(originArrMethods);
+        //复制一份array原型方法
+    arrMethods = Object.create(originArrMethods);
     ARR_METHODS.map(function (m) {
+      //重写数组方法
       arrMethods[m] = function () {
         let agrs = Array.prototype.slice.call(arguments),
             rt = originArrMethods[m].apply(this, agrs);
@@ -64,7 +67,8 @@
           case 'splice':
             newArr = agrs.slice(2);
             break;
-        }
+        } //改变数组的数据进行劫持
+
 
         newArr && observeArr(newArr);
         return rt;
@@ -78,9 +82,12 @@
 
     function Observer(data) {
       if (Array.isArray(data)) {
-        data.__proto__ = arrMethods;
+        //把重写数组方法给到数据的__proto__，目的用于拦截数组
+        data.__proto__ = arrMethods; //监听数组里面的每一项---递归操作
+
         observeArr(data);
       } else {
+        //对象的拦截
         this.walk(data);
       }
     }
@@ -105,7 +112,7 @@
 
     function initData(vm) {
       let data = vm.$options.data;
-      vm._data = data = typeof data === 'function' ? data.call(vm) : data || {};
+      vm._data = data = typeof data === 'function' ? data.call(vm) : data || {}; //数据代理 this._data.xxx => this.xxx
 
       for (let key in data) {
         proxyData(vm, '_data', key);

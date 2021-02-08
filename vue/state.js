@@ -11,6 +11,7 @@ function initState(vm){
 function initData(vm){
     let data = vm.$options.data;
     vm._data = data = typeof data === 'function' ? data.call(vm): data || {};
+    //数据代理 this._data.xxx => this.xxx
     for( let key in data ){
         proxyData(vm,'_data',key);
     }
