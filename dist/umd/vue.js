@@ -50,29 +50,34 @@
     let originArrMethods = Array.prototype,
         //复制一份array原型方法
     arrMethods = Object.create(originArrMethods);
-    ARR_METHODS.map(function (m) {
+    ARR_METHODS.map(function (method) {
       //重写数组方法
-      arrMethods[m] = function () {
-        let agrs = Array.prototype.slice.call(arguments),
-            rt = originArrMethods[m].apply(this, agrs);
-        console.log('数组方法劫持', rt);
-        let newArr;
+      Object.defineProperty(arrMethods, method, {
+        value: function () {
+          let agrs = Array.prototype.slice.call(arguments),
+              rt = originArrMethods[method].apply(this, agrs);
+          console.log('数组方法劫持', rt);
+          let newArr;
 
-        switch (m) {
-          case 'push':
-          case 'unshift':
-            newArr = agrs;
-            break;
+          switch (method) {
+            case 'push':
+            case 'unshift':
+              newArr = agrs;
+              break;
 
-          case 'splice':
-            newArr = agrs.slice(2);
-            break;
-        } //改变数组的数据进行劫持
+            case 'splice':
+              newArr = agrs.slice(2);
+              break;
+          } //改变数组的数据进行劫持
 
 
-        newArr && observeArr(newArr);
-        return rt;
-      };
+          newArr && observeArr(newArr);
+          return rt;
+        },
+        enumerable: false,
+        writable: true,
+        configurable: true
+      });
     });
 
     function observe(data) {
@@ -396,11 +401,18 @@
       };
     }
 
+    function callHook(vm, hook) {
+      const handlers = vm.$options[hook];
+      handlers && handlers.call(vm);
+    }
+
     function initMixin(Vue) {
       Vue.prototype._init = function (options) {
         let vm = this;
         vm.$options = options;
+        callHook(vm, 'beforeCreate');
         initState(vm);
+        callHook(vm, 'created');
 
         if (vm.$options.el) {
           //挂载函数

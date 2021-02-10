@@ -10,7 +10,14 @@ function lifecycleMixin(Vue){
     }
 }
 
+
+function callHook (vm, hook) {
+    const handlers = vm.$options[hook]
+    handlers && handlers.call(vm)
+}
+
 export {
     mountComponent,
-    lifecycleMixin
+    lifecycleMixin,
+    callHook
 }

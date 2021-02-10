@@ -19,11 +19,26 @@
 <script>
     const vm = new Vue({
         el:'#app',
+        created(){
+            console.log('created')
+        },
         data(){
             return{
                 name:'张三',
-                age:19
+                age:19,
+                list:[
+                    {
+                        name:'张三'
+                    },
+                    {
+                        name:'李四'
+                    }
+                ]
             }
         }
     })
+    // vm.list.push({
+    //     name:'sqwds'
+    // })
+    // console.log(vm.list)
 </script>
