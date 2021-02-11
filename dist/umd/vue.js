@@ -398,6 +398,7 @@
       Vue.prototype._updata = function (vnode) {
         const vm = this;
         patch(vm.$el, vnode);
+        callHook(vm, 'mounted');
       };
     }
 
@@ -424,6 +425,7 @@
         const vm = this,
               options = vm.$options;
         el = document.querySelector(el);
+        callHook(vm, 'beforeMount');
         vm.$el = el;
 
         if (!options.render) {

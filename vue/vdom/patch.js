@@ -1,9 +1,12 @@
+import { callHook } from './patch'
+
 function patch(oldNode, vNode){
     let el = createElement(vNode),
         parentElement = oldNode.parentNode;
     //把el插入到oldNode后面然后把前面的旧节点进行删除、这样做的目地是怕后面有script标签啥的
     parentElement.insertBefore(el,oldNode.nextSibling);
     parentElement.removeChild(oldNode);
+   
 }
 
 function createElement(vnode){

@@ -8,7 +8,7 @@
 <body>
     <div id="app" style="color: red; font-size:20px">
         hello{{ name }}
-        <span>我今年：{{ age }} 岁</span>
+        <span id="span">我今年：{{ age }} 岁</span>
         <div>学习vue源码</div>
     </div>
 </body>
@@ -20,7 +20,12 @@
     const vm = new Vue({
         el:'#app',
         created(){
-            console.log('created')
+            let text = document.getElementById('span')
+            console.log('created',text)
+        },
+        mounted(){
+            let text = document.getElementById('span')
+            console.log('dom挂载上去了',text)
         },
         data(){
             return{

@@ -18,6 +18,7 @@ function initMixin(Vue){
         const vm = this,
               options = vm.$options;
         el = document.querySelector(el);
+        callHook(vm, 'beforeMount');
         vm.$el = el;
         if(!options.render){
             let template = options.template;
